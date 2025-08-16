@@ -8,26 +8,19 @@ from pathlib import Path
 
 def load_params(sim_dir):
     """Lee el archivo params.txt y devuelve un diccionario."""
-    params_path = os.path.join(sim_dir, "params.txt")
-    params = {}
-    with open(params_path) as f:
-        for line in f:
-            if "=" in line:
-                k, v = line.strip().split("=", 1)
-                try:
-                    v = float(v) if "." in v or "e" in v.lower() else int(v)
-                except ValueError:
-                    pass
-                params[k] = v
+    params_path = os.path.join(sim_dir, "params.csv")
+    data = np.genfromtxt(params_path, delimiter=",", names=True)
+    params = {name: float(data[name]) for name in data.dtype.names}
     return params
 
 
 def load_steps(sim_dir):
     """Carga todos los archivos step_XXXXX.csv en una lista de arrays."""
-    files = sorted(f for f in os.listdir(sim_dir) if f.startswith("step_") and f.endswith(".csv"))
+    steps_dir = os.path.join(sim_dir, "steps")
+    files = sorted(f for f in os.listdir(steps_dir) if f.startswith("step_") and f.endswith(".csv"))
     steps = []
     for fname in files:
-        arr = np.genfromtxt(os.path.join(sim_dir, fname), delimiter=",", names=True)
+        arr = np.genfromtxt(os.path.join(steps_dir, fname), delimiter=",", names=True)
         steps.append(arr)
     return steps
 
