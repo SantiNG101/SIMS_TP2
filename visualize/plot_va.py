@@ -16,8 +16,8 @@ def compute_polarization(sim_dir, params):
     for step in steps:
         sum_vx = np.sum(step['vx'])
         sum_vy = np.sum(step['vy'])
-        mag = np.sqrt(sum_vx**2 + sum_vy**2)
-        v_a = mag / (N * v)
+        sum_velocity_magnitude = np.sqrt(sum_vx**2 + sum_vy**2)
+        v_a = sum_velocity_magnitude / (N * v)
         v_a_list.append(v_a)
 
     time_list = np.arange(len(v_a_list)) * save_every
@@ -27,10 +27,10 @@ def compute_polarization(sim_dir, params):
 # Grafica la polarización v_a(t)
 def plot_polarization(time_list, v_a_list, out_path):
     plt.figure(figsize=(8,5))
-    plt.plot(time_list, v_a_list, marker='o')
+    plt.plot(time_list, v_a_list, color='blue', label='v_a(t)')
     plt.xlabel("t")
     plt.ylabel("v_a(t)")
-    plt.title("Evolución temporal de la polarización")
+    plt.title("Evolución temporal de v_a")
     plt.grid(True)
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     print(f"Gráfico guardado en: {out_path}")
