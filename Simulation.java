@@ -10,26 +10,10 @@ public class Simulation {
 
     Simulation(Params p) throws IOException {
         this.p = p;
-        this.rng = new Random(p.seed);
+        this.rng = new Random();
         long ts = System.currentTimeMillis() / 1000L;
-        this.simDir = Paths.get(p.outDir, "sim_" + ts);
+        this.simDir = Paths.get(p.outDir + "/sims", "sim_" + ts);
         Files.createDirectories(simDir);
-
-        // Guardar params
-        try (BufferedWriter bw = Files.newBufferedWriter(simDir.resolve("params.csv"))) {
-            bw.write("N,L,rho,v,eta,r,steps,seed,save_every\n");
-            bw.write(String.format(Locale.US, "%d,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d,%d\n",
-                p.N,                // Número de partículas
-                p.L,                // Tamaño del espacio cuadrado
-                p.N / (p.L * p.L),  // Densidad (ρ = N / L^2)
-                p.v,                // Velocidad constante
-                p.eta,              // Intensidad del ruido angular (η)
-                p.r,                // Radio de interacción
-                p.steps,            // Número total de pasos de la simulación
-                p.seed,             // Semilla para reproducibilidad
-                p.saveEvery         // Cada cuántos pasos se guarda el estado
-            ));
-        }
 
         // Inicialización de partículas en posiciones y angulo aleatorios dentro del espacio
         for (int i = 0; i < p.N; i++) {

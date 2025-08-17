@@ -50,14 +50,20 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 
 if __name__ == "__main__":
 
-    sim_dir = get_simulation_directory()
-    params = load_params(sim_dir)
+    sims_dir = get_simulation_directory(eta=0.1, v=0.3, d=1.25)
+    sim_dir_name = "sim_1755462203"
+    sim_subdir_list = list(sims_dir.glob("sims/" + sim_dir_name))
+    if len(sim_subdir_list) == 0:
+        raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")
+    sim_subdir = sim_subdir_list[0]
+
+    params = load_params(sims_dir)
     L = params["L"]
 
     # Animaciones
-    out_plain = os.path.join(sim_dir, "anim_plain.gif")
-    out_angle = os.path.join(sim_dir, "anim_color_angle.gif")
-    animate_vectors(sim_dir, L, out_plain, color_by_angle=False)
-    animate_vectors(sim_dir, L, out_angle, color_by_angle=True)
+    out_plain = os.path.join(sim_subdir, "anim_plain.gif")
+    out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
+    animate_vectors(sim_subdir, L, out_plain, color_by_angle=False)
+    animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
 
     print(f"Animaciones guardadas en:\n{out_plain}\n{out_angle}")

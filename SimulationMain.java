@@ -1,46 +1,57 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Locale;
 
 public class SimulationMain {
     public static void main(String[] args) throws IOException {
-        Params p = Params.fromArgs(args);
+        
+        double eta_values[] = {0.1, 0.2};
+        double v_values[] = {0.3};
+        double L[] = {20.0};
+        int N[] = {500};
+    
+        for (double eta : eta_values) {
+            for (double v : v_values) {
+                for (double l : L) {
+                    for (int n : N) {
 
-        Simulation sim = new Simulation(p);
-        sim.run();
-        System.out.println("Simulación terminada en: " + sim.getSimDir().toAbsolutePath());
-    }
+                        String outDir = "outputs/eta" + eta + "_v" + v + "_d" + n/(l*l);
+                        Params p = new Params(eta, v, l, n, outDir);
+
+                        for (int runs = 0; runs < 10; runs++) {
+                            Simulation sim = new Simulation(p);
+                            sim.run();
+                            System.out.println("Simulación " + runs + " terminada en: " + sim.getSimDir().toAbsolutePath());
+                        }
+
+                        // Guardar params
+                        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(outDir).resolve("params.csv"))) {
+                            bw.write("N,L,rho,v,eta,r,steps,save_every\n");
+                            bw.write(String.format(Locale.US, "%d,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d\n", n, l, n / (l*l), v, eta, p.r, p.steps, p.saveEvery));
+                        }
+                    }
+                }
+            }
+        }
+    }  
 }
 
 class Params {
-    int N = 500;
-    double L = 20.0;
-    double v = 0.3;
-    double eta = 0.3;
-    double r = 0.5;
-    int steps = 200;
-    long seed = 7L;
-    int saveEvery = 1;
-    String outDir = "outputs";
+    int N = 500;                // Número de partículas
+    double L = 20.0;            // Tamaño del espacio cuadrado
+    double v = 0.3;             // Velocidad constante
+    double eta = 0.1;           // Intensidad del ruido angular (η)
+    double r = 0.5;             // Radio de interacción
+    int steps = 500;            // Número total de pasos de la simulación
+    int saveEvery = 1;          // Cada cuántos pasos se guarda el estado
+    String outDir = "outputs";  // Directorio de salida
 
-    static Params fromArgs(String[] args) {
-        Params p = new Params();
-        for (String a : args) {
-            if (!a.startsWith("--")) continue;
-            String[] kv = a.substring(2).split("=", 2);
-            if (kv.length != 2) continue;
-            String k = kv[0].toLowerCase();
-            String v = kv[1];
-            switch (k) {
-                case "n": p.N = Integer.parseInt(v); break;
-                case "l": p.L = Double.parseDouble(v); break;
-                case "v": p.v = Double.parseDouble(v); break;
-                case "eta": p.eta = Double.parseDouble(v); break;
-                case "r": p.r = Double.parseDouble(v); break;
-                case "steps": p.steps = Integer.parseInt(v); break;
-                case "seed": p.seed = Long.parseLong(v); break;
-                case "save_every": p.saveEvery = Integer.parseInt(v); break;
-                case "out_dir": p.outDir = v; break;
-            }
-        }
-        return p;
+    Params (Double eta, Double v, Double L, Integer N, String outDir) {
+        if(N != null) this.N = N;
+        if(L != null) this.L = L;
+        if(v != null) this.v = v;
+        if(eta != null) this.eta = eta;
+        if(outDir != null) this.outDir = outDir;
     }
 }

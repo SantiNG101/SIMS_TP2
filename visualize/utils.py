@@ -2,22 +2,25 @@ import os
 import numpy as np
 from pathlib import Path
 
-def get_simulation_directory():
-    """Busca la carpeta de simulación más reciente en outputs/."""
+def get_simulation_directory(eta, v, d):
+    """
+    Devuelve la carpeta de simulación para los parámetros dados (eta, v, d).
+    """
     root_dir = Path(__file__).resolve().parent.parent
     outputs_dir = root_dir / "outputs"
 
-    sim_folders = list(outputs_dir.glob("sim_*"))
-    if not sim_folders:
-        raise FileNotFoundError("No se encontraron carpetas 'sim_*' en outputs/")
+    folder_name = f"eta{eta}_v{v}_d{d}"
+    sim_dir = outputs_dir / folder_name
 
-    sim_dir = max(sim_folders, key=lambda p: p.stat().st_mtime)
+    if not sim_dir.exists():
+        raise FileNotFoundError(f"No se encontró la carpeta: {sim_dir}")
+
     print(f"Usando simulación: {sim_dir}")
     return sim_dir
 
 
 def load_params(sim_dir):
-    """Lee el archivo params.txt y devuelve un diccionario."""
+    """Lee el archivo params.csv y devuelve un diccionario."""
     params_path = os.path.join(sim_dir, "params.csv")
     data = np.genfromtxt(params_path, delimiter=",", names=True)
     params = {name: float(data[name]) for name in data.dtype.names}
