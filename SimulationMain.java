@@ -5,18 +5,19 @@ public class SimulationMain {
         Params p = Params.fromArgs(args);
 
         Simulation sim = new Simulation(p);
-        sim.run();
+        sim.runCIM();
         System.out.println("Simulación terminada en: " + sim.getSimDir().toAbsolutePath());
     }
 }
 
 class Params {
     int N = 500;
-    double L = 20.0;
+    double L = 40.0;
+    int M = 10;
     double v = 0.3;
     double eta = 0.3;
-    double r = 0.5;
-    int steps = 200;
+    double r = 1;
+    int steps = 1000;
     long seed = 7L;
     int saveEvery = 1;
     String outDir = "outputs";

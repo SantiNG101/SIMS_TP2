@@ -1,12 +1,16 @@
 public class Particle {
     private double x, y, theta;
+    private final int id;
+    private double c,s;
 
-    public Particle(double x, double y, double theta) {
+    public Particle(double x, double y, double theta, int id) {
         this.x = x;
         this.y = y;
         this.theta = theta;
+        this.id = id;
     }
 
+    public int getId() { return id; }
     public double getX(){
         return x;
     }
@@ -29,6 +33,24 @@ public class Particle {
 
      public void setTheta(double theta){
         this.theta=theta;
+    }
+
+    public void registerCloseParticle(Particle p) {
+        c += Math.cos(p.getTheta());
+        s += Math.sin(p.getTheta());
+    }
+    public static void registerCloseParticles(Particle p1, Particle p2){ //! suma atomica
+        p1.registerCloseParticle(p2);
+        p2.registerCloseParticle(p1);
+    }
+
+    public double getMeanAngle ( double N) {
+        return Math.atan2(s/N, c/N);
+    }
+
+    public void resetMeanAngle() {
+        c = 0.0;
+        s = 0.0;
     }
 
     public double vx(double v) { return v * Math.cos(theta); }
