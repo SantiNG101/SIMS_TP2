@@ -3,34 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.animation import PillowWriter
-from pathlib import Path
-
-
-def load_params(sim_dir):
-    """Lee el archivo params.txt y devuelve un diccionario."""
-    params_path = os.path.join(sim_dir, "params.txt")
-    params = {}
-    with open(params_path) as f:
-        for line in f:
-            if "=" in line:
-                k, v = line.strip().split("=", 1)
-                try:
-                    v = float(v) if "." in v or "e" in v.lower() else int(v)
-                except ValueError:
-                    pass
-                params[k] = v
-    return params
-
-
-def load_steps(sim_dir):
-    """Carga todos los archivos step_XXXXX.csv en una lista de arrays."""
-    files = sorted(f for f in os.listdir(sim_dir) if f.startswith("step_") and f.endswith(".csv"))
-    steps = []
-    for fname in files:
-        arr = np.genfromtxt(os.path.join(sim_dir, fname), delimiter=",", names=True)
-        steps.append(arr)
-    return steps
-
+from utils import load_params, load_steps, get_simulation_directory
 
 def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
     steps = load_steps(sim_dir)
@@ -77,25 +50,20 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 
 if __name__ == "__main__":
 
-    root_dir = Path(__file__).resolve().parent
-    outputs_dir = root_dir / "outputs"
+    sims_dir = get_simulation_directory(eta=0.1, v=0.3, d=1.25)
+    sim_dir_name = "sim_1755462203"
+    sim_subdir_list = list(sims_dir.glob("sims/" + sim_dir_name))
+    if len(sim_subdir_list) == 0:
+        raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")
+    sim_subdir = sim_subdir_list[0]
 
-    print(f"Buscando en: {outputs_dir.resolve()}")
-    print("Contenido:", list(outputs_dir.glob("*")))
-
-    sim_folders = list(outputs_dir.glob("sim_*"))
-    if not sim_folders:
-        raise FileNotFoundError("No se encontraron carpetas 'sim_*' en outputs/")
-
-    sim_dir = max(sim_folders, key=lambda p: p.stat().st_mtime)
-    print(f"Usando simulación: {sim_dir}")
-    params = load_params(sim_dir)
+    params = load_params(sims_dir)
     L = params["L"]
 
     # Animaciones
-    out_plain = os.path.join(sim_dir, "anim_plain.gif")
-    out_angle = os.path.join(sim_dir, "anim_color_angle.gif")
-    animate_vectors(sim_dir, L, out_plain, color_by_angle=False)
-    animate_vectors(sim_dir, L, out_angle, color_by_angle=True)
+    out_plain = os.path.join(sim_subdir, "anim_plain.gif")
+    out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
+    animate_vectors(sim_subdir, L, out_plain, color_by_angle=False)
+    animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
 
     print(f"Animaciones guardadas en:\n{out_plain}\n{out_angle}")

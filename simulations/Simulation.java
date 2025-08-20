@@ -1,6 +1,7 @@
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+package simulation;
 
 public class Simulation {
     private final Params p;
@@ -14,25 +15,13 @@ public class Simulation {
     Simulation(Params p) throws IOException {
         this.p = p;
         this.particles = new ArrayList<>(p.N);
-        this.rng = new Random(p.seed);
+        this.rng = new Random(1);
         this.periodic = true;
         cellSize = p.L / p.M;
 
         long ts = System.currentTimeMillis() / 1000L;
-        this.simDir = Paths.get(p.outDir, "sim_" + ts);
+        this.simDir = Paths.get(p.outDir + "/sims", "sim_" + ts);
         Files.createDirectories(simDir);
-
-        // Guardar params
-        try (BufferedWriter bw = Files.newBufferedWriter(simDir.resolve("params.txt"))) {
-            bw.write("N=" + p.N + "\n");
-            bw.write("L=" + p.L + "\n");
-            bw.write("v=" + p.v + "\n");
-            bw.write("eta=" + p.eta + "\n");
-            bw.write("r=" + p.r + "\n");
-            bw.write("steps=" + p.steps + "\n");
-            bw.write("seed=" + p.seed + "\n");
-            bw.write("save_every=" + p.saveEvery + "\n");
-        }
 
         generateParticles();
         computeCellNeighbors();
@@ -40,6 +29,7 @@ public class Simulation {
 
 
     private void generateParticles() {
+        // Inicialización de partículas en posiciones y angulo aleatorios dentro del espacio
         for (int i = 0; i < p.N; i++) {
             double x = rng.nextDouble() * p.L;
             double y = rng.nextDouble() * p.L;
@@ -152,23 +142,34 @@ public class Simulation {
         for (int t = 1; t <= p.steps; t++) {
             // Actualizar ángulos
             for (int i = 0; i < p.N; i++) {
-                double c = 0.0, s = 0.0;
+                double c = 0.0, s = 0.0, count = 0;
                 Particle pi = particles.get(i);
+
+                // Buscamos los vecinos dentro del radio r
                 for (int j = 0; j < p.N; j++) {
                     Particle pj = particles.get(j);
                     double dx = minImage(pj.getX() - pi.getX(), p.L);
                     double dy = minImage(pj.getY() - pi.getY(), p.L);
+
+                    // Si está dentro del radio de interacción, contribuye al promedio
                     if (dx*dx + dy*dy <= r2) {
                         c += Math.cos(pj.getTheta());
                         s += Math.sin(pj.getTheta());
+                        count++;
                     }
                 }
-                double meanAngle = Math.atan2(s/p.N, c/p.N);
+
+                // Calculamos el ángulo promedio de vecinos
+                // Si no hay vecinos, usamos el ángulo actual
+                double meanAngle = (count > 0) ? Math.atan2(s/ count, c/ count) : pi.getTheta();
+
+                // Añadimos ruido al ángulo promedio en el rango [-eta/2, eta/2]
                 double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
+
                 newTheta[i] = wrapAngle(meanAngle + noise);
             }
 
-            // Aplicar y mover
+            // Actualizar posiciones de las partículas
             for (int i = 0; i < p.N; i++) {
                 Particle pi = particles.get(i);
                 pi.setTheta(newTheta[i]);
@@ -181,7 +182,11 @@ public class Simulation {
     }
 
     private void writeStep(int t) throws IOException {
-        Path file = simDir.resolve(String.format("step_%03d.csv", t));
+        Path stepsDir = simDir.resolve("steps");
+        Files.createDirectories(stepsDir);
+
+        Path file = stepsDir.resolve(String.format("step_%03d.csv", t));
+
         try (BufferedWriter bw = Files.newBufferedWriter(file)) {
             bw.write("id,x,y,vx,vy\n");
             for (int i = 0; i < particles.size(); i++) {
@@ -198,11 +203,15 @@ public class Simulation {
         d = d - Math.rint(d / L) * L;
         return d;
     }
+
+    // Asegura que la posición esté en [0, L)
     private static double wrapPos(double a, double L) {
         a = a % L;
         if (a < 0) a += L;
         return a;
     }
+
+    // Asegura que el ángulo esté en [0, 2π)
     private static double wrapAngle(double ang) {
         double twoPi = 2.0 * Math.PI;
         ang = ang % twoPi;
