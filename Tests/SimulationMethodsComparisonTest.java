@@ -4,37 +4,30 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import Models.Params;
+import Models.SimulationMain;
 
-        import java.io.*;
-        import java.nio.file.*;
-        import java.util.*;
-        import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.*;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SimulationMethodsComparisonTest {
 
-    private Path runSimulation(String mode, Params p) throws IOException {
-        Simulation sim = new Simulation(p);
-        if (mode.equals("brute")) {
-            sim.runBruteForce();
-        } else if (mode.equals("cim")) {
-            sim.runCIM();
-        } else {
-            throw new IllegalArgumentException("Modo desconocido: " + mode);
-        }
-        return sim.getSimDir();
-    }
 
-    private Path getLastStepFile(Path simDir) throws IOException {
-        try (var files = Files.list(simDir)) {
+    private static Path getLastStepFile(String dir) throws IOException {
+        try (Stream<Path> files = Files.list(Paths.get(dir))) {
             return files
-                    .filter(f -> f.getFileName().toString().startsWith("step_"))
-                    .sorted(Comparator.comparingInt(f -> {
+                    .filter(f -> f.getFileName().toString().startsWith("step_")
+                            && f.getFileName().toString().endsWith(".csv"))
+                    .max(Comparator.comparingInt(f -> {
                         String name = f.getFileName().toString();
-                        return Integer.parseInt(name.substring(5, name.length() - 4)); // step_XXXXX.csv
+                        String num = name.substring(5, name.length() - 4); // entre "step_" y ".csv"
+                        return Integer.parseInt(num);
                     }))
-                    .reduce((first, second) -> second) // último
-                    .orElseThrow(() -> new FileNotFoundException("No step_*.csv en " + simDir));
+                    .orElseThrow(() -> new IOException("No step_*.csv files found in " + dir));
         }
     }
 
@@ -49,14 +42,17 @@ public class SimulationMethodsComparisonTest {
     @Test
     public void testBruteForceVsCIM() throws IOException {
         // mismo conjunto de parámetros para ambos
-        Params p1 = new Params(0.1, 0.3, 20.0, 500, "outputs/sim_brute");
-        Params p2 = new Params(0.1, 0.3, 20.0, 500, "outputs/sim_cim");
 
-        Path dirBrute = runSimulation("brute", p1);
-        Path dirCIM = runSimulation("cim", p2);
+        String outDir = "outputs/comparison";
+        Params p = new Params(0.1, 0.3, 20.0, 500, outDir);
+        p.setSeed(20);
 
-        Path lastBrute = getLastStepFile(dirBrute);
-        Path lastCIM = getLastStepFile(dirCIM);
+        String dirBrute = SimulationMain.runSimpleSimulation(p,true);
+        String dirCIM = SimulationMain.runSimpleSimulation(p,false);
+
+
+        Path lastBrute = getLastStepFile(dirCIM + "/steps");
+        Path lastCIM = getLastStepFile(dirBrute + "/steps");
 
         List<String[]> bruteData = loadCsv(lastBrute);
         List<String[]> cimData = loadCsv(lastCIM);
@@ -80,6 +76,4 @@ public class SimulationMethodsComparisonTest {
             }
         }
     }
-}
-{
 }

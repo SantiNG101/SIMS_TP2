@@ -1,3 +1,5 @@
+package Models;
+
 public class Particle {
     private double x, y, theta;
     private final int id;

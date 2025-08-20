@@ -1,9 +1,18 @@
+package Models;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
 
 public class SimulationMain {
+    public static String runSimpleSimulation(Params p, Boolean useBruteForce) throws IOException {
+        Simulation sim = new Simulation(p);
+        if (useBruteForce) sim.runBruteForce(); else sim.runCIM();
+        System.out.println("Simulación " + (useBruteForce? "BruteForce":"CIM") + " terminada en: " + sim.getSimDir().toAbsolutePath());
+        return sim.getSimDir().toString();
+    }
+
     public static void main(String[] args) throws IOException {
         int n_runs = args.length==0? 1:Integer.parseInt(args[0]);
 
@@ -23,7 +32,7 @@ public class SimulationMain {
 
                         for (int runs = 0; runs < n_runs; runs++) {
                             Simulation sim = new Simulation(p);
-                            sim.runBruteForce();
+                            sim.runCIM();
                             System.out.println("Simulación " + runs + " terminada en: " + sim.getSimDir().toAbsolutePath());
                         }
 
@@ -41,22 +50,3 @@ public class SimulationMain {
     }
 }
 
-class Params {
-    int N = 500;                // Número de partículas
-    double L = 40.0;            // Tamaño del espacio cuadrado
-    double v = 0.3;             // Velocidad constante
-    double eta = 0.1;           // Intensidad del ruido angular (η)
-    double r = 0.5;             // Radio de interacción
-    int steps = 1000;            // Número total de pasos de la simulación
-    int saveEvery = 1;          // Cada cuántos pasos se guarda el estado
-    String outDir = "outputs";  // Directorio de salida
-    int M = 12;
-
-    Params (Double eta, Double v, Double L, Integer N, String outDir) {
-        if(N != null) this.N = N;
-        if(L != null) this.L = L;
-        if(v != null) this.v = v;
-        if(eta != null) this.eta = eta;
-        if(outDir != null) this.outDir = outDir;
-    }
-}

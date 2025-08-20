@@ -1,7 +1,8 @@
+package Models;
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-package simulation;
 
 public class Simulation {
     private final Params p;
@@ -12,10 +13,10 @@ public class Simulation {
     private final boolean periodic;
     private final double cellSize;
 
-    Simulation(Params p) throws IOException {
+    public Simulation(Params p) throws IOException {
         this.p = p;
         this.particles = new ArrayList<>(p.N);
-        this.rng = new Random(1);
+        this.rng = p.seed==null? new Random():new Random(p.seed);
         this.periodic = true;
         cellSize = p.L / p.M;
 
@@ -26,7 +27,6 @@ public class Simulation {
         generateParticles();
         computeCellNeighbors();
     }
-
 
     private void generateParticles() {
         // Inicialización de partículas en posiciones y angulo aleatorios dentro del espacio
@@ -121,7 +121,7 @@ public class Simulation {
 
     }
 
-    void runCIM() throws IOException {
+    public void runCIM() throws IOException {
         writeStep(0);
 
         for (int t = 1; t <= p.steps; t++) {
@@ -133,7 +133,7 @@ public class Simulation {
     }
 
 
-    void runBruteForce() throws IOException {
+    public void runBruteForce() throws IOException {
         writeStep(0);
 
         double[] newTheta = new double[p.N];
@@ -197,7 +197,7 @@ public class Simulation {
         }
     }
 
-    Path getSimDir() { return simDir; }
+    public Path getSimDir() { return simDir; }
 
     private static double minImage(double d, double L) {
         d = d - Math.rint(d / L) * L;
