@@ -55,7 +55,11 @@ public class SimulationMethodsComparisonTest {
     @Test
     public void testBruteForceVsCIM() throws IOException {
         // mismo conjunto de parámetros para ambos
-        // p.setSeed(2);
+        p.setSeed(2);
+        compareWithSpecificSeed();
+    }
+
+    private void compareWithSpecificSeed() throws IOException {
 
         String dirBrute = SimulationMain.runSimpleSimulation(p,true);
         String dirCIM = SimulationMain.runSimpleSimulation(p,false);
