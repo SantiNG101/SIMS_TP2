@@ -24,16 +24,30 @@ def compute_polarization(sim_dir, params):
     return time_list, np.array(v_a_list)
 
 
-# Grafica la polarización v_a(t)
-def plot_polarization(time_list, v_a_list, out_path):
-    plt.figure(figsize=(8,5))
+# Lee polarization.csv de la carpeta out_dir y grafica v_a(t).
+def plot_polarization(out_dir):
+    csv_path = os.path.join(out_dir, "polarization.csv")
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"No se encontró {csv_path}")
+
+    # Cargo los datos
+    data = np.genfromtxt(csv_path, delimiter=",", names=True)
+    time_list = data["t"]
+    v_a_list = data["v_a"]
+
+    # Graficar
+    plt.figure(figsize=(8, 5))
     plt.plot(time_list, v_a_list, color='blue', label='v_a(t)')
     plt.xlabel("t")
     plt.ylabel("v_a(t)")
     plt.title("Evolución temporal de v_a")
     plt.grid(True)
-    plt.savefig(out_path, dpi=300, bbox_inches='tight')
-    print(f"Gráfico guardado en: {out_path}")
+
+    # Guardar gráfico en la misma carpeta
+    out_fig = os.path.join(out_dir, "va.png")
+    plt.savefig(out_fig, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Gráfico guardado en: {out_fig}")
 
 
 # Calcula y grafica el promedio de v_a(t) a partir de múltiples simulaciones
@@ -97,16 +111,15 @@ if __name__ == "__main__":
     for sim_subdir in sorted(sims_dir.glob("sims/sim_*")):
 
         # Calculamos la polarización
-        t_list, va_list = compute_polarization(sim_subdir, params)
+        #t_list, va_list = compute_polarization(sim_subdir, params)
 
         # Guardamos el CSV
-        out_csv = os.path.join(sim_subdir, "polarization.csv")
-        np.savetxt(out_csv, np.column_stack((t_list, va_list)), delimiter=",", header="t,v_a", comments="", fmt="%.6f")
-        print(f"CSV guardado en: {out_csv}")
+        #out_csv = os.path.join(sim_subdir, "polarization.csv")
+        #np.savetxt(out_csv, np.column_stack((t_list, va_list)), delimiter=",", header="t,v_a", comments="", fmt="%.6f")
+        #print(f"CSV guardado en: {out_csv}")
 
         # Graficamos la polarización en el tiempo
-        # out_fig = os.path.join(sim_subdir, "va.png")
-        # plot_polarization(t_list, va_list, out_fig)
+        plot_polarization(sim_subdir)
 
 # ---------------- Parte 2: promedio de todas las simulaciones ------------------------
-    plot_average_polarization(sims_dir)
+    #plot_average_polarization(sims_dir)
