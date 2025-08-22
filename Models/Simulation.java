@@ -12,6 +12,7 @@ public class Simulation {
     private Map<Integer, List<Particle>> grid;
     private final boolean periodic;
     private final double cellSize;
+    private final int NOT_FOUND = -1;
 
     public Simulation(Params p) throws IOException {
         this.p = p;
@@ -27,6 +28,8 @@ public class Simulation {
         generateParticles();
         computeCellNeighbors();
     }
+
+    /* -------------------- INITIALIZATION METHODS  -------------------- */
 
     private void generateParticles() {
         // Inicialización de partículas en posiciones y angulo aleatorios dentro del espacio
@@ -88,6 +91,25 @@ public class Simulation {
         }
     }
 
+    /* -------------------- UPDATE PARTICLES METHODS  -------------------- */
+
+    public void updateParticlesWithRandomNeighbor(Map<Integer, Integer> randomNeighbors) {
+        for (Particle pi : particles) {     //! paralelizable
+            Particle randomNeighbor;
+            if ( randomNeighbors.containsKey(pi.getId()))
+                randomNeighbor = particles.get(randomNeighbors.get(pi.getId()));        // it has to consider itself to calculate the mean
+            else
+                randomNeighbor = pi;
+            pi.registerCloseParticle(randomNeighbor);
+            double meanAngle = pi.getMeanAngle(p.N);
+            double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
+            pi.setTheta(wrapAngle(meanAngle + noise));
+            pi.setX(wrapPos(pi.getX() + p.v * Math.cos(pi.getTheta()), p.L));
+            pi.setY(wrapPos(pi.getY() + p.v * Math.sin(pi.getTheta()), p.L));
+            pi.resetMeanAngle();
+        }
+    }
+
     public void updateParticles() {
         for (Particle pi : particles) {     //! paralelizable
             pi.registerCloseParticle(pi);       // it has to consider itself to calculate the mean
@@ -97,6 +119,32 @@ public class Simulation {
             pi.setX(wrapPos(pi.getX() + p.v * Math.cos(pi.getTheta()), p.L));
             pi.setY(wrapPos(pi.getY() + p.v * Math.sin(pi.getTheta()), p.L));
             pi.resetMeanAngle();
+        }
+    }
+
+    /* -------------------- CIM FIND NEIGHBORS METHODS  -------------------- */
+
+    private void findRandomNeighborsCIM(Map<Integer,Integer> randomNeighbors) {
+        final double r2 = p.r * p.r;
+        for (Particle p1 : particles) {
+            int cellX = (int) (p1.getX() / cellSize);
+            int cellY = (int) (p1.getY() / cellSize);
+            int cellIndex = cellX + cellY * p.M;
+
+            final int randomNum = rng.nextInt(p.N);
+            int chosenNeighborId = NOT_FOUND;
+            for (int neighborIndex : cellNeighbors.get(cellIndex)) {
+                for (Particle p2 : grid.getOrDefault(neighborIndex, new ArrayList<>())) {
+                    if (p1.getId() == p2.getId()) continue;
+
+                    if (calculateDistance(p2, p1) <= r2 && ( chosenNeighborId==NOT_FOUND || Math.abs(p2.getId() - randomNum) < Math.abs(chosenNeighborId - randomNum)) ) {
+                        chosenNeighborId  = p2.getId();
+                    }
+                }
+            }
+
+            if (chosenNeighborId != NOT_FOUND)
+                randomNeighbors.put(p1.getId(), chosenNeighborId);
         }
     }
 
@@ -121,6 +169,20 @@ public class Simulation {
 
     }
 
+    /* -------------------- RUN METHODS  -------------------- */
+
+    public void runRandomNeighborsCIM() throws IOException {
+        writeStep(0);
+
+        for (int t = 1; t <= p.steps; t++) {
+            initializeGrid();
+            Map<Integer,Integer> randomNeighbors = new HashMap<>();
+            findRandomNeighborsCIM(randomNeighbors);
+            updateParticlesWithRandomNeighbor(randomNeighbors);
+            if (t % p.saveEvery == 0) writeStep(t);
+        }
+    }
+
     public void runCIM() throws IOException {
         writeStep(0);
 
@@ -131,7 +193,6 @@ public class Simulation {
             if (t % p.saveEvery == 0) writeStep(t);
         }
     }
-
 
     public void runBruteForce() throws IOException {
         writeStep(0);
@@ -181,6 +242,8 @@ public class Simulation {
         }
     }
 
+    /* -------------------- WRITE METHODS  -------------------- */
+
     private void writeStep(int t) throws IOException {
         Path stepsDir = simDir.resolve("steps");
         Files.createDirectories(stepsDir);
@@ -198,6 +261,8 @@ public class Simulation {
     }
 
     public Path getSimDir() { return simDir; }
+
+    /* -------------------- DISTANCE METHODS  -------------------- */
 
     private static double minImage(double d, double L) {
         d = d - Math.rint(d / L) * L;

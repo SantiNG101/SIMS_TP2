@@ -51,7 +51,7 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 if __name__ == "__main__":
 
     sims_dir = get_simulation_directory(eta=0.1, v=0.3, d=1.25)
-    sim_dir_name = "sim_1755644815"
+    sim_dir_name = "sim_1755895097"
     sim_subdir_list = list(sims_dir.glob("sims/" + sim_dir_name))
     if len(sim_subdir_list) == 0:
         raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")

@@ -24,4 +24,5 @@ public class Params {
 
     public void setOutDir(String outDir) { this.outDir = outDir; }
 
+    public Integer getSeed() { return this.seed; }
 }

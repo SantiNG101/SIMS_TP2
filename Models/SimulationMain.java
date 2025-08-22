@@ -13,6 +13,13 @@ public class SimulationMain {
         return sim.getSimDir().toString();
     }
 
+    public static String runSimpleSimulationUsingOneRandomNeighbor(Params p) throws IOException {
+        Simulation sim = new Simulation(p);
+        sim.runRandomNeighborsCIM();
+        System.out.println("Simulación d) terminada en: " + sim.getSimDir().toAbsolutePath());
+        return sim.getSimDir().toString();
+    }
+
     public static void main(String[] args) throws IOException {
         int n_runs = args.length==0? 1:Integer.parseInt(args[0]);
 
