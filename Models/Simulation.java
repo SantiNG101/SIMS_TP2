@@ -185,7 +185,7 @@ public class Simulation {
         Path stepsDir = simDir.resolve("steps");
         Files.createDirectories(stepsDir);
 
-        Path file = stepsDir.resolve(String.format("step_%03d.csv", t));
+        Path file = stepsDir.resolve(String.format("step_%04d.csv", t));
 
         try (BufferedWriter bw = Files.newBufferedWriter(file)) {
             bw.write("id,x,y,vx,vy\n");
