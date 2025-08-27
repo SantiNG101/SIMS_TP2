@@ -19,8 +19,8 @@ def compute_stationary_va(t, va, stationary_first_step, sims_dir):
     params = load_params(sims_dir)
 
     # Archivo de salida global
-    root_dir = sims_dir.parent  # sube un nivel, ej: outputs/eta0.1_v0.3_d1.25
-    out_csv = root_dir.parent / "outputs" / "input_vs_observable.csv"
+    outputs_dir = "input_vs_output"
+    out_csv = os.path.join(outputs_dir, "input_vs_observable.csv")
 
     # Armar fila con parámetros + observables
     row = {**params, "va_mean": va_mean, "va_std": va_std}
@@ -33,8 +33,6 @@ def compute_stationary_va(t, va, stationary_first_step, sims_dir):
             writer.writeheader()
         writer.writerow(row)
 
-    print(f"Promedio de v_a en estado estacionario: {va_mean:.6f}")
-    print(f"Desvío estándar de v_a en estado estacionario: {va_std:.6f}")
     print(f"Resultado guardado en: {out_csv}")
 
     return va_mean, va_std
@@ -45,14 +43,13 @@ def plot_va_with_stationary(t, va, stationary_index, va_mean, sim_dir):
     plt.figure(figsize=(8,5))
     
     # v_a completa
-    plt.plot(t, va, color='blue', label='v_a(t)')
+    plt.plot(t, va, color='blue', label=r'$v_a(t)$')
     
     # v_a en estado estacionario resaltada
     plt.plot(t[stationary_index:], va[stationary_index:], color='violet', marker='o', linestyle='None', label='Estado estacionario')
 
     plt.xlabel("t")
-    plt.ylabel("v_a(t)")
-    plt.title(f"Evolución temporal de v_a con estado estacionario")
+    plt.ylabel(r"$v_a(t)$")
     plt.grid(True)
     plt.legend()
         
@@ -65,27 +62,29 @@ def plot_va_with_stationary(t, va, stationary_index, va_mean, sim_dir):
 
 if __name__ == "__main__":
 
-    # Modificar estos parámetros según sea necesario
-    sims_dir = get_simulation_directory(eta=0.1, v=0.3, d=1.25)
+    # Definir los parámetros de las simulaciones a procesar
+    # (eta, v, d, stationary_index)
+    runs = [
+        (0.2, 0.3, 0.625, 1250),
+        (0.2, 0.3, 0.0625, 1500),
+        (0.2, 0.3, 1.25, 1250),
+            ]
 
-# ---------------- Parte 1: procesar cada simulación individual ------------------------
+    for eta, v, d, stationary_index in runs:
 
-    sim_dir_name = "sim_1755875186"
-    sim_subdir = sims_dir / "sims" / sim_dir_name
+        sims_dir = get_simulation_directory(eta, v, d)
 
-    if not sim_subdir.exists():
-        raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")
+        sim_subdirs = list((sims_dir / "sims").glob("sim_*"))
+        for sim_subdir in sim_subdirs:
+            csv_path = sim_subdir / "polarization.csv"
+            if not csv_path.exists():
+                raise FileNotFoundError(f"No se encontró polarization.csv en {sim_subdir}")
 
-    csv_path = sim_subdir / "polarization.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(f"No se encontró polarization.csv en {sim_subdir}")
+            # Leer CSV con columnas t, v_a
+            data = np.genfromtxt(csv_path, delimiter=",", names=True)
+            t = data["t"]
+            va = data["v_a"]
 
-    # Leer CSV con columnas t, v_a
-    data = np.genfromtxt(csv_path, delimiter=",", names=True)
-    t = data["t"]
-    va = data["v_a"]
+            va_mean, va_std = compute_stationary_va(t, va, stationary_index, sims_dir)
 
-    stationary_index = 1000 
-    va_mean, va_std = compute_stationary_va(t, va, stationary_index, sims_dir)
-
-    plot_va_with_stationary(t, va, stationary_index, va_mean, sim_subdir)   
+            plot_va_with_stationary(t, va, stationary_index, va_mean, sim_subdir)   

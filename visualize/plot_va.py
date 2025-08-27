@@ -37,10 +37,9 @@ def plot_polarization(out_dir):
 
     # Graficar
     plt.figure(figsize=(8, 5))
-    plt.plot(time_list, v_a_list, color='blue', label='v_a(t)')
+    plt.plot(time_list, v_a_list, color='blue', label=r'$v_a(t)$')
     plt.xlabel("t")
-    plt.ylabel("v_a(t)")
-    plt.title("Evolución temporal de v_a")
+    plt.ylabel(r"$v_a(t)$")
     plt.grid(True)
 
     # Guardar gráfico en la misma carpeta
@@ -76,13 +75,16 @@ def plot_average_polarization(out_dir):
     va_mean = np.mean(all_va, axis=0)
     va_std = np.std(all_va, axis=0)
 
+    # Acoto el error para que no salga de [0,1]
+    lower = np.clip(va_mean - va_std, 0, None)   # no baja de 0
+    upper = np.clip(va_mean + va_std, None, 1)   # no sube de 1
+
     # Graficar
     plt.figure(figsize=(8,5))
-    plt.plot(time_list, va_mean, color="blue", label="Promedio v_a(t)")
-    plt.fill_between(time_list, va_mean - va_std, va_mean + va_std, color="blue", alpha=0.3, label="Desvío estándar")
+    plt.plot(time_list, va_mean, color="blue", label=r"Promedio $v_a(t)$")
+    plt.fill_between(time_list, lower, upper, color="blue", alpha=0.3, label="Desvío estándar")
     plt.xlabel("t")
-    plt.ylabel("v_a(t)")
-    plt.title("Promedio de v_a(t) con error")
+    plt.ylabel(r"$v_a(t)$")
     plt.legend()
     plt.grid(True)
 
@@ -102,24 +104,32 @@ def plot_average_polarization(out_dir):
 
 if __name__ == "__main__":
 
-    # Modificar estos parámetros según sea necesario
-    sims_dir = get_simulation_directory(eta=0.1, v=0.3, d=1.25)
-    params = load_params(sims_dir)
+    # Definir los parámetros de las simulaciones a procesar
+    # (eta, v, d, stationary_index)
+    runs = [
+        (0.2, 0.3, 1.25),
+        
+            ]
+    
+    # ---------------- Parte 1: procesar cada simulación individual ------------------------
 
+    for eta, v, d in runs:
 
-# ---------------- Parte 1: procesar cada simulación individual ------------------------
-    for sim_subdir in sorted(sims_dir.glob("sims/sim_*")):
+        sims_dir = get_simulation_directory(eta, v, d)
+        params = load_params(sims_dir)
 
-        # Calculamos la polarización
-        #t_list, va_list = compute_polarization(sim_subdir, params)
+        for sim_subdir in sorted(sims_dir.glob("sims/sim_*")):
 
-        # Guardamos el CSV
-        #out_csv = os.path.join(sim_subdir, "polarization.csv")
-        #np.savetxt(out_csv, np.column_stack((t_list, va_list)), delimiter=",", header="t,v_a", comments="", fmt="%.6f")
-        #print(f"CSV guardado en: {out_csv}")
+            # Calculamos la polarización
+            t_list, va_list = compute_polarization(sim_subdir, params)
 
-        # Graficamos la polarización en el tiempo
-        plot_polarization(sim_subdir)
+            # Guardamos el CSV
+            out_csv = os.path.join(sim_subdir, "polarization.csv")
+            np.savetxt(out_csv, np.column_stack((t_list, va_list)), delimiter=",", header="t,v_a", comments="", fmt="%.6f")
+            print(f"CSV guardado en: {out_csv}")
+
+            # Graficamos la polarización en el tiempo
+            plot_polarization(sim_subdir)
 
 # ---------------- Parte 2: promedio de todas las simulaciones ------------------------
-    #plot_average_polarization(sims_dir)
+        plot_average_polarization(sims_dir)
