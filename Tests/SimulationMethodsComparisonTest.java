@@ -16,6 +16,9 @@ import java.util.stream.Stream;
 
 public class SimulationMethodsComparisonTest {
 
+    private final String outDir = "outputs/comparison";
+    private final Params p = new Params(0.1, 0.3, 20.0, 500, outDir);
+
 
     private static Path getLastStepFile(String dir) throws IOException {
         try (Stream<Path> files = Files.list(Paths.get(dir))) {
@@ -40,12 +43,23 @@ public class SimulationMethodsComparisonTest {
     }
 
     @Test
+    public void testDifferentSeeds() throws IOException {
+        Random rand = new Random();
+        int n_seeds = 10;
+        for (int i=0; i< n_seeds; i++) {
+            p.setSeed(rand.nextInt());
+            testBruteForceVsCIM();
+        }
+    }
+
+    @Test
     public void testBruteForceVsCIM() throws IOException {
         // mismo conjunto de parámetros para ambos
+        p.setSeed(2);
+        compareWithSpecificSeed();
+    }
 
-        String outDir = "outputs/comparison";
-        Params p = new Params(0.1, 0.3, 20.0, 500, outDir);
-        p.setSeed(20);
+    private void compareWithSpecificSeed() throws IOException {
 
         String dirBrute = SimulationMain.runSimpleSimulation(p,true);
         String dirCIM = SimulationMain.runSimpleSimulation(p,false);
@@ -57,12 +71,12 @@ public class SimulationMethodsComparisonTest {
         List<String[]> bruteData = loadCsv(lastBrute);
         List<String[]> cimData = loadCsv(lastCIM);
 
-        assertEquals(bruteData.size(), cimData.size(), "Distinto número de filas");
+        assertEquals(bruteData.size(), cimData.size(), "seed " + p.getSeed() + " - Distinto número de filas");
 
         for (int i = 0; i < bruteData.size(); i++) {
             String[] row1 = bruteData.get(i);
             String[] row2 = cimData.get(i);
-            assertEquals(row1.length, row2.length, "Fila " + i + " tiene distinta cantidad de columnas");
+            assertEquals(row1.length, row2.length, "seed " + p.getSeed() + " - Fila " + i + " tiene distinta cantidad de columnas");
 
             for (int j = 0; j < row1.length; j++) {
                 double v1, v2;
@@ -72,8 +86,11 @@ public class SimulationMethodsComparisonTest {
                 } catch (NumberFormatException e) {
                     continue; // probablemente cabecera
                 }
-                assertEquals(v1, v2, 1e-8, "Diferencia en fila " + i + ", columna " + j);
+                assertEquals(v1, v2, 1e-8, "seed " + p.getSeed() + " - Diferencia en fila " + i + ", columna " + j);
             }
         }
+
+        System.out.println("Prueba exitosa - seed " + p.getSeed());
     }
+
 }
