@@ -37,10 +37,9 @@ def plot_polarization(out_dir):
 
     # Graficar
     plt.figure(figsize=(8, 5))
-    plt.plot(time_list, v_a_list, color='blue', label='v_a(t)')
+    plt.plot(time_list, v_a_list, color='blue', label=r'$v_a(t)$')
     plt.xlabel("t")
-    plt.ylabel("v_a(t)")
-    plt.title("Evolución temporal de v_a")
+    plt.ylabel(r"$v_a(t)$")
     plt.grid(True)
 
     # Guardar gráfico en la misma carpeta
@@ -82,11 +81,10 @@ def plot_average_polarization(out_dir):
 
     # Graficar
     plt.figure(figsize=(8,5))
-    plt.plot(time_list, va_mean, color="blue", label="Promedio v_a(t)")
+    plt.plot(time_list, va_mean, color="blue", label=r"Promedio $v_a(t)$")
     plt.fill_between(time_list, lower, upper, color="blue", alpha=0.3, label="Desvío estándar")
     plt.xlabel("t")
-    plt.ylabel("v_a(t)")
-    plt.title("Promedio de v_a(t) con error acotado")
+    plt.ylabel(r"$v_a(t)$")
     plt.legend()
     plt.grid(True)
 
@@ -109,9 +107,8 @@ if __name__ == "__main__":
     # Definir los parámetros de las simulaciones a procesar
     # (eta, v, d, stationary_index)
     runs = [
-        (0.2, 0.3, 0.3125),
-        (0.5, 0.3, 0.3125),
-        (1.0, 0.3, 0.3125)
+        (0.2, 0.3, 1.25),
+        
             ]
     
     # ---------------- Parte 1: procesar cada simulación individual ------------------------
