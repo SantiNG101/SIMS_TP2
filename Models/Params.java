@@ -22,7 +22,5 @@ public class Params {
     
     public void setSeed(int seed) { this.seed = seed; }
 
-    public void setOutDir(String outDir) { this.outDir = outDir; }
-
     public Integer getSeed() { return this.seed; }
 }

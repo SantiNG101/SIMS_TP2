@@ -93,7 +93,7 @@ public class Simulation {
 
     /* -------------------- UPDATE PARTICLES METHODS  -------------------- */
 
-    public void updateParticlesWithRandomNeighbor(Map<Integer, Integer> randomNeighbors) {
+    private void updateParticlesWithRandomNeighbor(Map<Integer, Integer> randomNeighbors) {
         for (Particle pi : particles) {     //! paralelizable
             Particle randomNeighbor;
             if ( randomNeighbors.containsKey(pi.getId()))
@@ -110,7 +110,7 @@ public class Simulation {
         }
     }
 
-    public void updateParticles() {
+    private void updateParticles() {
         for (Particle pi : particles) {     //! paralelizable
             pi.registerCloseParticle(pi);       // it has to consider itself to calculate the mean
             double meanAngle = pi.getMeanAngle(p.N);
@@ -148,7 +148,7 @@ public class Simulation {
         }
     }
 
-    public void findNeighborsCIM() {
+    private void findNeighborsCIM() {
         final double r2 = p.r * p.r;
         for (Particle p1 : particles) {
             int cellX = (int) (p1.getX() / cellSize);
