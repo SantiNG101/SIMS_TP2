@@ -22,11 +22,12 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
     if color_by_angle:
         ang = (np.arctan2(vy, vx) + 2*np.pi) % (2*np.pi)
         quiv = ax.quiver(x, y, vx, vy, ang, cmap="hsv", angles='xy',
-                         scale_units='xy', scale=0.6, pivot='middle', width=0.01)
+                         scale_units='xy', scale=0.1, pivot='middle', width=0.01)
         cbar = fig.colorbar(quiv, ax=ax, shrink=0.7)
         cbar.set_label("Ángulo de la velocidad (rad)")
     else:
-        quiv = ax.quiver(x, y, vx, vy, angles='xy', scale_units='xy', scale=0.6, pivot='middle', width=0.01)
+        quiv = ax.quiver(x, y, vx, vy, angles='xy', scale_units='xy',
+                         scale=0.1, pivot='middle', width=0.01)
 
     ax.set_xlabel("x")
     ax.set_ylabel("y")
@@ -43,8 +44,8 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
         ax.set_title(f"t={frame_idx}")
         return quiv,
 
-    anim = animation.FuncAnimation(fig, update, frames=len(step_indices), interval=50, blit=False)
-    anim.save(out_path, writer=PillowWriter(fps=20))
+    anim = animation.FuncAnimation(fig, update, frames=len(step_indices), interval=20, blit=False)
+    anim.save(out_path, writer=PillowWriter(fps=50))
     plt.close(fig)
 
 
@@ -52,8 +53,8 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 
 if __name__ == "__main__":
 
-    sims_dir = get_simulation_directory(eta=1.0, v=0.03, d=2.5)
-    sim_dir_name = "sim_1756327052"
+    sims_dir = get_simulation_directory(eta=0.1, v=0.03, d=2.5)
+    sim_dir_name = "sim_1756328754"
     sim_subdir_list = list(sims_dir.glob("sims/" + sim_dir_name))
     if len(sim_subdir_list) == 0:
         raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")
@@ -63,9 +64,8 @@ if __name__ == "__main__":
     L = params["L"]
 
     # Animaciones
-    out_plain = os.path.join(sim_subdir, "anim_plain.gif")
     out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
-    animate_vectors(sim_subdir, L, out_plain, color_by_angle=False)
     animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
 
-    print(f"Animaciones guardadas en:\n{out_plain}\n{out_angle}")
+    print(f"Animaciones guardadas en:\n{out_angle}")
+

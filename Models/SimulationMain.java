@@ -27,9 +27,9 @@ public class SimulationMain {
         int n_runs = args.length==0? 1:Integer.parseInt(args[0]);
 
         double eta_values[] = {0.1};
-        double v_values[] = {0.3};
+        double v_values[] = {0.03};
         double L[] = {20.0};
-        int N[] = {500};
+        int N[] = {1000};
 
 
         for (double eta : eta_values) {
