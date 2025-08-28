@@ -42,4 +42,19 @@ public class PythonVisualize {
             System.err.println("Error generando animación");
         }
     }
+
+    public static void animate_vectors_n_simulations() throws IOException, InterruptedException {
+
+        String script = Paths.get(projectRoot, "visualize", "animate_vectors.py").toString();
+        ProcessBuilder pb = new ProcessBuilder(
+                pythonEnvironment,
+                script
+        );
+        pb.inheritIO();  // para ver la salida de Python en la consola
+        Process process = pb.start();
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            System.err.println("Error generando animación");
+        }
+    }
 }
