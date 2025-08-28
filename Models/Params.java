@@ -1,5 +1,11 @@
 package Models;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Locale;
+
 public class Params {
     int N = 500;                // Número de partículas
     double L = 10.0;            // Tamaño del espacio cuadrado
@@ -22,7 +28,14 @@ public class Params {
     
     public void setSeed(int seed) { this.seed = seed; }
 
-    public void setOutDir(String outDir) { this.outDir = outDir; }
-
     public Integer getSeed() { return this.seed; }
+
+    public void createCSVFile(){
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(outDir).resolve("params.csv"))) {
+            bw.write("N,L,rho,v,eta,r,steps,save_every\n");
+            bw.write(String.format(Locale.US, "%d,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d\n", N, L, N / (L*L), v, eta, r, steps, saveEvery));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

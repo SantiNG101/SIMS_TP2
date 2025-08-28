@@ -10,6 +10,7 @@ public class SimulationMain {
         Simulation sim = new Simulation(p);
         if (useBruteForce) sim.runBruteForce(); else sim.runCIM();
         System.out.println("Simulación " + (useBruteForce? "BruteForce":"CIM") + " terminada en: " + sim.getSimDir().toAbsolutePath());
+        p.createCSVFile();
         return sim.getSimDir().toString();
     }
 
@@ -17,8 +18,10 @@ public class SimulationMain {
         Simulation sim = new Simulation(p);
         sim.runRandomNeighborsCIM();
         System.out.println("Simulación d) terminada en: " + sim.getSimDir().toAbsolutePath());
+        p.createCSVFile();
         return sim.getSimDir().toString();
     }
+
 
     public static void main(String[] args) throws IOException {
         int n_runs = args.length==0? 1:Integer.parseInt(args[0]);

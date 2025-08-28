@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class SimulationMethodsComparisonTest {
 
     private final String outDir = "outputs/comparison";
-    private final Params p = new Params(0.1, 0.3, 20.0, 500, outDir);
+    private final Params p = new Params(0.1, 0.3, 25.0, 500, outDir);
 
 
     private static Path getLastStepFile(String dir) throws IOException {
@@ -48,7 +48,7 @@ public class SimulationMethodsComparisonTest {
         int n_seeds = 10;
         for (int i=0; i< n_seeds; i++) {
             p.setSeed(rand.nextInt());
-            testBruteForceVsCIM();
+            compareWithSpecificSeed();
         }
     }
 
