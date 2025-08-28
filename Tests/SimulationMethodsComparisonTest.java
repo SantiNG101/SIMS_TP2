@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class SimulationMethodsComparisonTest {
 
     private final String outDir = "outputs/comparison";
-    private final Params p = new Params(0.1, 0.3, 25.0, 500, outDir);
+    private final Params p = new Params(0.1, 0.03, 10.0, 500, outDir);
 
 
     private static Path getLastStepFile(String dir) throws IOException {

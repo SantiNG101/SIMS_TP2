@@ -17,7 +17,6 @@ public class Params {
     String outDir = "outputs";  // Directorio de salida
     int M = 5;                 // cantidad de celdas por fila/columna
     Integer seed = null;
-    boolean FVM = false;
 
     public Params(Double eta, Double v, Double L, Integer N, String outDir) {
         if(N != null) this.N = N;
@@ -34,15 +33,6 @@ public class Params {
         if(eta != null) this.eta = eta;
         if(outDir != null) this.outDir = outDir;
         if (steps != null) this.steps = steps;
-    }
-
-    public Params(Double eta, Double v, Double L, Integer N, String outDir, boolean FVM) {
-        if(N != null) this.N = N;
-        if(L != null) this.L = L;
-        if(v != null) this.v = v;
-        if(eta != null) this.eta = eta;
-        if(outDir != null) this.outDir = outDir;
-        this.FVM = FVM;
     }
 
     public void setSteps(int steps) {

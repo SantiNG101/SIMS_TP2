@@ -119,12 +119,10 @@ public class Simulation {
         for (Particle pi : particles) {     //! paralelizable
             if ( randomNeighbors.containsKey(pi.getId()) ) {
                 Particle randomNeighbor = particles.get(randomNeighbors.get(pi.getId()));
-                pi.registerCloseParticle(randomNeighbor);
-                double meanAngle = pi.getMeanAngle(p.N);
                 double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
-                pi.setTheta(wrapAngle(meanAngle + noise));
-                pi.resetMeanAngle();
+                pi.setTheta(wrapAngle(randomNeighbor.getTheta() + noise));
             }
+
             pi.setX(wrapPos(pi.getX() + p.v * Math.cos(pi.getTheta()), p.L));
             pi.setY(wrapPos(pi.getY() + p.v * Math.sin(pi.getTheta()), p.L));
         }
@@ -133,7 +131,7 @@ public class Simulation {
     private void updateParticles() {
         for (Particle pi : particles) {     //! paralelizable
             pi.registerCloseParticle(pi);               // Se debe considerar a sí misma para calcular el meanAngle
-            double meanAngle = pi.getMeanAngle(p.N);
+            double meanAngle = pi.getMeanAngle();
             double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
             pi.setTheta(wrapAngle(meanAngle + noise));
             pi.setX(wrapPos(pi.getX() + p.v * Math.cos(pi.getTheta()), p.L));
@@ -151,20 +149,17 @@ public class Simulation {
             int cellY = (int) (p1.getY() / cellSize);
             int cellIndex = cellX + cellY * p.M;
 
-            final int randomNum = rng.nextInt(p.N);
-            int chosenNeighborId = NOT_FOUND;
+            List<Integer> neighbors = new ArrayList<>();
             for (int neighborIndex : cellNeighbors.get(cellIndex)) {
                 for (Particle p2 : grid.getOrDefault(neighborIndex, new ArrayList<>())) {
-                    if (p1.getId() == p2.getId()) continue;
-
-                    if (calculateDistance(p2, p1) <= r2 && ( chosenNeighborId==NOT_FOUND || Math.abs(p2.getId() - randomNum) < Math.abs(chosenNeighborId - randomNum)) ) {
-                        chosenNeighborId  = p2.getId();
+                    if (p1.getId() != p2.getId() && calculateDistance(p2, p1) <= r2 ) {
+                        neighbors.add(p2.getId());
                     }
                 }
             }
 
-            if (chosenNeighborId != NOT_FOUND)
-                randomNeighbors.put(p1.getId(), chosenNeighborId);
+            if (!neighbors.isEmpty())
+                randomNeighbors.put(p1.getId(), neighbors.get( rng.nextInt(neighbors.size()) ) );
         }
     }
 
