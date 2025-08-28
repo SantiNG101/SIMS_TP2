@@ -40,16 +40,16 @@ public class OneRandomNeighborTest {
     }
 
     @Test
-    public void test() throws IOException {
+    public void test() throws IOException, InterruptedException {
         // mismo conjunto de parámetros para ambos
-        Double eta = 0.1, v= 0.3, l=20.0;
-        int n = 5000;
+        Double eta = 0.0, v= 0.01, l=12.0;
+        int n = 4000;
         String outDir = "outputs/eta" + eta + "_v" + v + "_d" + n/(l*l);
-        Params p = new Params(eta, v, l, n, outDir);
+        Params p = new Params(eta, v, l, n, outDir,true);
         p.setSeed(20);
 
-        SimulationMain.runSimpleSimulationUsingOneRandomNeighbor(p);
-
+        Path simDir = SimulationMain.runSimpleSimulationUsingOneRandomNeighbor(p);
+        PythonVisualize.animate_vectors(outDir,simDir);
     }
 }
 

@@ -1,11 +1,15 @@
 import os
+import sys
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import io
 from PIL import Image
+import argparse
+from pathlib import Path
 
-from visualize.utils import load_steps, load_params, get_simulation_directory
+
+from utils import load_steps, load_params, get_simulation_directory
 
 
 def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
@@ -92,7 +96,36 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 
 # ---------------------------
 
+def animate_single_simulation():
+    parser = argparse.ArgumentParser(description="Generar animación de simulación")
+    parser.add_argument("sims_dir", type=str, help="Directorio sims (ej: outputs/eta0.1_v0.3_d12.5)")
+    parser.add_argument("sim_name", type=str, help="Nombre de la simulación (ej: sim_1756343233)")
+
+    args = parser.parse_args()
+
+    sims_dir = Path(args.sims_dir).resolve()
+    sim_subdir = sims_dir / "sims" / args.sim_name
+
+    if not sim_subdir.exists():
+        raise FileNotFoundError(f"No existe {sim_subdir}")
+
+    params = load_params(sims_dir)
+    L = params["L"]
+
+    out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
+    animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
+
+    print(f"Animación guardada en:\n{out_angle}")
+
+
+# ---------------------------
+
 if __name__ == "__main__":
+
+    if len(sys.argv) > 1:
+        animate_single_simulation()
+        sys.exit(0)
+
     runs = [
         (0.0, 0.03, 5.0),  # (eta, v, d)
         (0.5, 0.03, 5.0),
