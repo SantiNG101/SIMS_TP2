@@ -42,8 +42,7 @@ def plot_line_chart(csv_path, out_path=None, L_filter=None, fixed_params=None):
     va_mean = va_mean[order]
     va_std = va_std[order]
 
-    n_points = len(rho)
-    x_pos = np.arange(n_points)
+    x_pos = np.log10(rho)
 
     plt.figure(figsize=(8,5))
     plt.errorbar(

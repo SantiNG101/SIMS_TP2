@@ -100,7 +100,7 @@ def plot_line_chart(csv_path, out_path=None, eta_filter=None, fixed_params=None)
 
     plt.xlabel("η")
     plt.ylabel(r"Polarización promedio $<v_a>$")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.grid(True, linestyle="--", alpha=0.7)
 
     # Etiquetas encima de cada punto
     for x, y in zip(eta, va_mean):
