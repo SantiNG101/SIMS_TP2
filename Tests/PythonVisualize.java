@@ -24,16 +24,16 @@ public class PythonVisualize {
      * Genera animación llamando al script de Python
      *
      * @param simsDir carpeta de simulación relativa a projectRoot (ej: "outputs/eta0.1_v0.3_d12.5")
-     * @param simName nombre de la simulación (ej: "sim_1756343233")
+     * @param simName nombre de la simulación (ej: "sim_1756343233") = simDir.getFileName().toString()
      */
-    public static void animate_vectors(String simsParamsDir, Path simDir) throws IOException, InterruptedException {
+    public static void animate_vectors(String simsParamsDir, String simsDirName) throws IOException, InterruptedException {
 
         String script = Paths.get(projectRoot, "visualize", "animate_vectors.py").toString();
         ProcessBuilder pb = new ProcessBuilder(
                 pythonEnvironment,
                 script,
                 simsParamsDir,
-                simDir.getFileName().toString()
+                simsDirName
         );
         pb.inheritIO();  // para ver la salida de Python en la consola
         Process process = pb.start();
@@ -46,6 +46,21 @@ public class PythonVisualize {
     public static void animate_vectors_n_simulations() throws IOException, InterruptedException {
 
         String script = Paths.get(projectRoot, "visualize", "animate_vectors.py").toString();
+        ProcessBuilder pb = new ProcessBuilder(
+                pythonEnvironment,
+                script
+        );
+        pb.inheritIO();  // para ver la salida de Python en la consola
+        Process process = pb.start();
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            System.err.println("Error generando animación");
+        }
+    }
+
+    public static void plot_n_simulations() throws IOException, InterruptedException {
+
+        String script = Paths.get(projectRoot, "visualize", "plot_va.py").toString();
         ProcessBuilder pb = new ProcessBuilder(
                 pythonEnvironment,
                 script

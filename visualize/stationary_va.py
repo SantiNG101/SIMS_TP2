@@ -53,6 +53,7 @@ def plot_va_with_stationary(t, va, stationary_index, va_mean, sim_dir):
     plt.ylim(0, 1.05)
     plt.grid(True)
     plt.legend()
+    plt.ylim(0, 1.05)
         
     out_path = os.path.join(sim_dir, "va_stationary.png")
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
@@ -66,10 +67,15 @@ if __name__ == "__main__":
     # Definir los parámetros de las simulaciones a procesar
     # (eta, v, d, stationary_index)
     runs = [
-        (0.2, 0.3, 0.625, 1250),
-        (0.2, 0.3, 0.0625, 1500),
-        (0.2, 0.3, 1.25, 1250),
-            ]
+        (0.0, 0.03, 5.0, 1250),
+        (0.025, 0.03, 5.0, 800),
+        (0.05, 0.03, 5.0,1250),
+        (0.1, 0.03, 5.0,900),
+        (0.25, 0.03, 5.0,500),
+        (0.5, 0.03, 5.0,250),
+        (1.0, 0.03, 5.0,100),
+        (2.0, 0.03, 5.0,100)
+    ]
 
     for eta, v, d, stationary_index in runs:
 

@@ -32,7 +32,7 @@ def plot_bar_char(csv_path, out_path=None, eta_filter=None):
 
     # Posiciones equiespaciadas en el eje X
     x_pos = np.arange(len(eta))
-    
+
     # Graficar
     plt.figure(figsize=(8,5))
     bar_width = 0.5
@@ -110,7 +110,7 @@ def plot_line_chart(csv_path, out_path=None, eta_filter=None, fixed_params=None)
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     print(f"✅ Gráfico guardado en: {out_path}")
 
-    
+
 
 # ---------------------------
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     "r": 1.0,
     "steps": 1000,
     "save_every": 1.0
-    }   
+    }
 
     # Filtrar solo ciertos valores de eta para mostrar el gráfico
     eta_filter = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]

@@ -89,6 +89,7 @@ def plot_average_polarization(out_dir):
     plt.ylim(0, 1.05)
     plt.legend()
     plt.grid(True)
+    plt.ylim(0, 1.05)
 
     out_path = os.path.join(out_dir, "va_avg.png")
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
@@ -109,8 +110,14 @@ if __name__ == "__main__":
     # Definir los parámetros de las simulaciones a procesar
     # (eta, v, d, stationary_index)
     runs = [
-        (0.2, 0.3, 1.25),
-        
+        (0.0, 0.03, 5.0),
+        (0.025, 0.03, 5.0),
+        (0.05, 0.03, 5.0),
+        (0.1, 0.03, 5.0),
+        (0.25, 0.03, 5.0),
+        (0.5, 0.03, 5.0),
+        (1.0, 0.03, 5.0),
+        (2.0, 0.03, 5.0)
             ]
     
     # ---------------- Parte 1: procesar cada simulación individual ------------------------

@@ -24,6 +24,6 @@ public class RunOneCIMSimulation {
         long durationBF = TimeUnit.NANOSECONDS.toMillis(endTimeBF - startTimeBF);
         System.out.println("Execution Time: " + durationBF + " ms");
 
-        PythonVisualize.animate_vectors(outDir,simDir);
+        PythonVisualize.animate_vectors(outDir,simDir.getFileName().toString());
     }
 }

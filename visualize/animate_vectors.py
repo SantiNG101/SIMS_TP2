@@ -60,7 +60,7 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
         else:
             quiv.set_UVC(vx, vy)
         quiv.set_offsets(np.c_[x, y])
-        ax.set_title(f"t={frame_idx}")
+        ax.set_title(f"t={step_indices[frame_idx]}")
         return quiv,
 
     frames = []
@@ -120,13 +120,8 @@ def animate_single_simulation():
 
 # ---------------------------
 
-if __name__ == "__main__":
-
-    if len(sys.argv) > 1:
-        animate_single_simulation()
-        sys.exit(0)
-
-    runs = [
+runs_map = {
+    "SVM": [
         (0.0, 0.03, 5.0),  # (eta, v, d)
         (0.5, 0.03, 5.0),
         (1.0, 0.03, 5.0),
@@ -136,9 +131,30 @@ if __name__ == "__main__":
         (3.0, 0.03, 5.0),
         (4.0, 0.03, 5.0),
         (5.0, 0.03, 5.0),
+    ],
+    "FVM": [
+        (0.0, 0.03, 5.0),
+        (0.025, 0.03, 5.0),
+        (0.05, 0.03, 5.0),
+        (0.1, 0.03, 5.0),
+        (0.25, 0.03, 5.0),
+        (0.5, 0.03, 5.0),
+        (1.0, 0.03, 5.0),
+        (1.5, 0.03, 5.0),
+        (2.0, 0.03, 5.0)
+    ]
+}
 
-        
-            ]
+
+if __name__ == "__main__":
+
+    if len(sys.argv) > 1:
+        animate_single_simulation()
+        sys.exit(0)
+
+
+    isFVM = True
+    runs = runs = runs_map[ "FVM" if isFVM else "SVM"]
     
     # ---------------- Parte 1: procesar cada simulación individual ------------------------
 
