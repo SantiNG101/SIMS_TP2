@@ -53,7 +53,7 @@ def plot_line_chart(csv_path, out_path=None, L_filter=None, fixed_params=None):
 
     plt.xlabel(r"Densidad $\rho$")
     plt.ylabel(r"Polarización promedio $<v_a>$")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.grid(True, linestyle="--", alpha=0.7)
     plt.ylim(0, 1.05)
 
     tick_labels = [f"{r:.2f}\nL={int(l)}" for r, l in zip(rho, L)]
