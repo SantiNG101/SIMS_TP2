@@ -40,6 +40,7 @@ def plot_polarization(out_dir):
     plt.plot(time_list, v_a_list, color='blue', label=r'$v_a(t)$')
     plt.xlabel("t")
     plt.ylabel(r"$v_a(t)$")
+    plt.ylim(0, 1.02)
     plt.grid(True)
 
     # Guardar gráfico en la misma carpeta
@@ -85,6 +86,7 @@ def plot_average_polarization(out_dir):
     plt.fill_between(time_list, lower, upper, color="blue", alpha=0.3, label="Desvío estándar")
     plt.xlabel("t")
     plt.ylabel(r"$v_a(t)$")
+    plt.ylim(0, 1.05)
     plt.legend()
     plt.grid(True)
     plt.ylim(0, 1.05)
