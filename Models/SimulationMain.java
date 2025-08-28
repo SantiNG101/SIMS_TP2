@@ -2,6 +2,7 @@ package Models;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
@@ -14,12 +15,12 @@ public class SimulationMain {
         return sim.getSimDir().toString();
     }
 
-    public static String runSimpleSimulationUsingOneRandomNeighbor(Params p) throws IOException {
+    public static Path runSimpleSimulationUsingOneRandomNeighbor(Params p) throws IOException {
         Simulation sim = new Simulation(p);
         sim.runRandomNeighborsCIM();
         System.out.println("Simulación d) terminada en: " + sim.getSimDir().toAbsolutePath());
         p.createCSVFile();
-        return sim.getSimDir().toString();
+        return sim.getSimDir().toAbsolutePath();
     }
 
 

@@ -26,7 +26,6 @@ public class Simulation {
         Files.createDirectories(simDir);
 
         generateParticles();
-        computeCellNeighbors();
     }
 
     /* -------------------- INITIALIZATION METHODS  -------------------- */
@@ -59,7 +58,7 @@ public class Simulation {
 
     private Map<Integer, List<Integer>> cellNeighbors;
 
-    private void computeCellNeighbors() {
+    private void computeTopCornerCellNeighbors() {
         cellNeighbors = new HashMap<>();
 
         for (int cellY = 0; cellY < p.M; cellY++) {
@@ -91,28 +90,49 @@ public class Simulation {
         }
     }
 
+    private void computeAllCellNeighbors() {
+        cellNeighbors = new HashMap<>();
+
+        for (int cellY = 0; cellY < p.M; cellY++) {
+            for (int cellX = 0; cellX < p.M; cellX++) {
+                int cellIndex = cellX + cellY * p.M;
+                List<Integer> neighbors = new ArrayList<>();
+
+                // Recorro el bloque 3x3 (incluye la celda misma)
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        int neighborCellX = (cellX + dx + p.M) % p.M;
+                        int neighborCellY = (cellY + dy + p.M) % p.M;
+
+                        int neighborCellIndex = neighborCellX + neighborCellY * p.M;
+                        neighbors.add(neighborCellIndex);
+                    }
+                }
+                cellNeighbors.put(cellIndex, neighbors);
+            }
+        }
+    }
+
     /* -------------------- UPDATE PARTICLES METHODS  -------------------- */
 
     private void updateParticlesWithRandomNeighbor(Map<Integer, Integer> randomNeighbors) {
         for (Particle pi : particles) {     //! paralelizable
-            Particle randomNeighbor;
-            if ( randomNeighbors.containsKey(pi.getId()))
-                randomNeighbor = particles.get(randomNeighbors.get(pi.getId()));        // it has to consider itself to calculate the mean
-            else
-                randomNeighbor = pi;
-            pi.registerCloseParticle(randomNeighbor);
-            double meanAngle = pi.getMeanAngle(p.N);
-            double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
-            pi.setTheta(wrapAngle(meanAngle + noise));
+            if ( randomNeighbors.containsKey(pi.getId()) ) {
+                Particle randomNeighbor = particles.get(randomNeighbors.get(pi.getId()));
+                pi.registerCloseParticle(randomNeighbor);
+                double meanAngle = pi.getMeanAngle(p.N);
+                double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
+                pi.setTheta(wrapAngle(meanAngle + noise));
+                pi.resetMeanAngle();
+            }
             pi.setX(wrapPos(pi.getX() + p.v * Math.cos(pi.getTheta()), p.L));
             pi.setY(wrapPos(pi.getY() + p.v * Math.sin(pi.getTheta()), p.L));
-            pi.resetMeanAngle();
         }
     }
 
     private void updateParticles() {
         for (Particle pi : particles) {     //! paralelizable
-            pi.registerCloseParticle(pi);       // it has to consider itself to calculate the mean
+            pi.registerCloseParticle(pi);               // Se debe considerar a sí misma para calcular el meanAngle
             double meanAngle = pi.getMeanAngle(p.N);
             double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
             pi.setTheta(wrapAngle(meanAngle + noise));
@@ -173,6 +193,7 @@ public class Simulation {
 
     public void runRandomNeighborsCIM() throws IOException {
         writeStep(0);
+        computeAllCellNeighbors();
 
         for (int t = 1; t <= p.steps; t++) {
             initializeGrid();
@@ -185,6 +206,7 @@ public class Simulation {
 
     public void runCIM() throws IOException {
         writeStep(0);
+        computeTopCornerCellNeighbors();
 
         for (int t = 1; t <= p.steps; t++) {
             initializeGrid();

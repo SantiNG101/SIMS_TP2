@@ -1,3 +1,5 @@
+import argparse
+from pathlib import Path
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -52,20 +54,22 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 # ---------------------------
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generar animación de simulación")
+    parser.add_argument("sims_dir", type=str, help="Directorio sims (ej: outputs/eta0.1_v0.3_d12.5)")
+    parser.add_argument("sim_name", type=str, help="Nombre de la simulación (ej: sim_1756343233)")
 
-    sims_dir = get_simulation_directory(eta=0.1, v=0.03, d=2.5)
-    sim_dir_name = "sim_1756328754"
-    sim_subdir_list = list(sims_dir.glob("sims/" + sim_dir_name))
-    if len(sim_subdir_list) == 0:
-        raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")
-    sim_subdir = sim_subdir_list[0]
+    args = parser.parse_args()
+
+    sims_dir = Path(args.sims_dir).resolve()
+    sim_subdir = sims_dir / "sims" / args.sim_name
+
+    if not sim_subdir.exists():
+        raise FileNotFoundError(f"No existe {sim_subdir}")
 
     params = load_params(sims_dir)
     L = params["L"]
 
-    # Animaciones
     out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
     animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
 
-    print(f"Animaciones guardadas en:\n{out_angle}")
-
+    print(f"Animación guardada en:\n{out_angle}")
