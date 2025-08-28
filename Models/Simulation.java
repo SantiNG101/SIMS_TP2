@@ -22,7 +22,7 @@ public class Simulation {
         cellSize = p.L / p.M;
 
         long ts = System.currentTimeMillis() / 1000L;
-        this.simDir = Paths.get(p.outDir + "/sims", "sim_" + ts);
+        this.simDir = Paths.get(p.outDir + "/sims", "sim_" + ts + "_" + rng.nextInt(p.N) + ".csv");
         Files.createDirectories(simDir);
 
         generateParticles();

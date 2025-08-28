@@ -36,7 +36,9 @@ public class SimulationMain {
                             Simulation sim = new Simulation(p);
                             if (runFVM) {
                                 sim.runRandomNeighborsCIM();
-                            } else sim.runCIM();
+                            } else {
+                                sim.runCIM();
+                            }
                             System.out.println("Simulación " + runs + " terminada en: " + sim.getSimDir().toAbsolutePath());
                         }
 
