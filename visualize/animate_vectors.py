@@ -38,11 +38,11 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
     if color_by_angle:
         ang = (np.arctan2(vy, vx) + 2 * np.pi) % (2 * np.pi)
         quiv = ax.quiver(x, y, vx, vy, ang, cmap="hsv", norm=norm,
-                         angles='xy', scale_units='xy', scale=0.1,
+                         angles='xy', scale_units='xy', scale=0.14,
                          pivot='middle', width=0.01)
     else:
         quiv = ax.quiver(x, y, vx, vy, angles='xy', scale_units='xy',
-                         scale=0.1, pivot='middle', width=0.01)
+                         scale=0.14, pivot='middle', width=0.01)
 
     ax.set_xlabel("x")
     ax.set_ylabel("y")
@@ -91,21 +91,40 @@ def animate_vectors(sim_dir, L, out_path, color_by_angle=False):
 
 
 # ---------------------------
+
 if __name__ == "__main__":
+    runs = [
+        (0.0, 0.03, 5.0),  # (eta, v, d)
+        (0.5, 0.03, 5.0),
+        (1.0, 0.03, 5.0),
+        (1.5, 0.03, 5.0),
+        (2.0, 0.03, 5.0),
+        (2.5, 0.03, 5.0),
+        (3.0, 0.03, 5.0),
+        (4.0, 0.03, 5.0),
+        (5.0, 0.03, 5.0),
 
-    sims_dir = get_simulation_directory(eta=0.1, v=0.03, d=2.5)
-    sim_dir_name = "sim_1756328754"
-    sim_subdir_list = list(sims_dir.glob("sims/" + sim_dir_name))
-    if len(sim_subdir_list) == 0:
-        raise FileNotFoundError(f"No se encontró la simulación {sim_dir_name}")
-    sim_subdir = sim_subdir_list[0]
+        
+            ]
+    
+    # ---------------- Parte 1: procesar cada simulación individual ------------------------
 
-    params = load_params(sims_dir)
-    L = params["L"]
+    for eta, v, d in runs:
 
-    # Animaciones
-    out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
-    animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
+        sims_dir = get_simulation_directory(eta, v, d)
+        params = load_params(sims_dir)
 
-    print(f"Animaciones guardadas en:\n{out_angle}")
+        for sim_subdir in sorted(sims_dir.glob("sims/sim_*")):
+            if "sim_plus_" in sim_subdir.name:
+                continue
+
+            params = load_params(sims_dir)
+            L = params["L"]
+
+            # Animaciones
+            out_angle = os.path.join(sim_subdir, "anim_color_angle.gif")
+            animate_vectors(sim_subdir, L, out_angle, color_by_angle=True)
+
+            print(f"Animaciones guardadas en:\n{out_angle}")
+
 
