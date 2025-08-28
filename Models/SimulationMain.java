@@ -7,12 +7,12 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 public class SimulationMain {
-    public static String runSimpleSimulation(Params p, Boolean useBruteForce) throws IOException {
+    public static Path runSimpleSimulation(Params p, Boolean useBruteForce) throws IOException {
         Simulation sim = new Simulation(p);
         if (useBruteForce) sim.runBruteForce(); else sim.runCIM();
         System.out.println("Simulación " + (useBruteForce? "BruteForce":"CIM") + " terminada en: " + sim.getSimDir().toAbsolutePath());
         p.createCSVFile();
-        return sim.getSimDir().toString();
+        return sim.getSimDir().toAbsolutePath();
     }
 
     public static Path runSimpleSimulationUsingOneRandomNeighbor(Params p) throws IOException {

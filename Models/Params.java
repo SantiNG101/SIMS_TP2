@@ -12,7 +12,7 @@ public class Params {
     double v = 0.03;             // Velocidad constante
     double eta = 0.1;           // Intensidad del ruido angular (η)
     double r = 1;             // Radio de interacción
-    int steps = 5000;            // Número total de pasos de la simulación
+    int steps = 1000;            // Número total de pasos de la simulación
     int saveEvery = 1;          // Cada cuántos pasos se guarda el estado
     String outDir = "outputs";  // Directorio de salida
     int M = 5;                 // cantidad de celdas por fila/columna

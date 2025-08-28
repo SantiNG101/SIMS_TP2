@@ -61,8 +61,8 @@ public class SimulationMethodsComparisonTest {
 
     private void compareWithSpecificSeed() throws IOException {
 
-        String dirBrute = SimulationMain.runSimpleSimulation(p,true);
-        String dirCIM = SimulationMain.runSimpleSimulation(p,false);
+        String dirBrute = SimulationMain.runSimpleSimulation(p,true).toString();
+        String dirCIM = SimulationMain.runSimpleSimulation(p,false).toString();
 
 
         Path lastBrute = getLastStepFile(dirCIM + "/steps");
