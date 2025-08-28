@@ -53,6 +53,10 @@ public class Particle {
         return Math.atan2(s/count, c/count);
     }
 
+    public boolean hasCloseParticles() {
+        return count > 0;
+    }
+
     public void resetMeanAngle() {
         c = 0.0;
         s = 0.0;

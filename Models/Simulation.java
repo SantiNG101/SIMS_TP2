@@ -115,12 +115,13 @@ public class Simulation {
 
     /* -------------------- UPDATE PARTICLES METHODS  -------------------- */
 
-    private void updateParticlesWithRandomNeighbor(Map<Integer, Integer> randomNeighbors) {
+    private void updateParticlesWithRandomNeighbor() {
         for (Particle pi : particles) {     //! paralelizable
-            if ( randomNeighbors.containsKey(pi.getId()) ) {
-                Particle randomNeighbor = particles.get(randomNeighbors.get(pi.getId()));
+            if ( pi.hasCloseParticles() ) {
+                double meanAngle = pi.getMeanAngle();
                 double noise = rng.nextDouble() * p.eta - (p.eta / 2.0);
-                pi.setTheta(wrapAngle(randomNeighbor.getTheta() + noise));
+                pi.setTheta(wrapAngle(meanAngle + noise));
+                pi.resetMeanAngle();
             }
 
             pi.setX(wrapPos(pi.getX() + p.v * Math.cos(pi.getTheta()), p.L));
@@ -142,7 +143,7 @@ public class Simulation {
 
     /* -------------------- CIM FIND NEIGHBORS METHODS  -------------------- */
 
-    private void findRandomNeighborsCIM(Map<Integer,Integer> randomNeighbors) {
+    private void findRandomNeighborsCIM() {
         final double r2 = p.r * p.r;
         for (Particle p1 : particles) {
             int cellX = (int) (p1.getX() / cellSize);
@@ -158,8 +159,11 @@ public class Simulation {
                 }
             }
 
-            if (!neighbors.isEmpty())
-                randomNeighbors.put(p1.getId(), neighbors.get( rng.nextInt(neighbors.size()) ) );
+            if (!neighbors.isEmpty()) {
+                Particle randomNeighbor = particles.get( neighbors.get( rng.nextInt(neighbors.size()) ) );
+                p1.registerCloseParticle(randomNeighbor);
+            }
+
         }
     }
 
@@ -192,9 +196,8 @@ public class Simulation {
 
         for (int t = 1; t <= p.steps; t++) {
             initializeGrid();
-            Map<Integer,Integer> randomNeighbors = new HashMap<>();
-            findRandomNeighborsCIM(randomNeighbors);
-            updateParticlesWithRandomNeighbor(randomNeighbors);
+            findRandomNeighborsCIM();
+            updateParticlesWithRandomNeighbor();
             if (t % p.saveEvery == 0) writeStep(t);
         }
     }

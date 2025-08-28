@@ -15,10 +15,10 @@ public class RunFVMSimulations {
         @Test
         public void testSingleSimulation() throws IOException, InterruptedException {
                 // mismo conjunto de parámetros para ambos
-                Double eta = 2.0, v= 0.03, l=10.0;
+                Double eta = 0.05, l=10.0;
                 int n = 500;
                 String outDir = "outputs/eta" + eta + "_v" + v + "_d" + n/(l*l);
-                Params p = new Params(eta, v, l, n, outDir,1000);
+                Params p = new Params(eta, v, l, n, outDir,2000);
                 //  p.setSeed(20);
 
                 Path simDir = SimulationMain.runSimpleSimulationUsingOneRandomNeighbor(p);
