@@ -46,10 +46,11 @@ def plot_va_with_stationary(t, va, stationary_index, va_mean, sim_dir):
     plt.plot(t, va, color='blue', label=r'$v_a(t)$')
     
     # v_a en estado estacionario resaltada
-    plt.plot(t[stationary_index:], va[stationary_index:], color='violet', marker='o', linestyle='None', label='Estado estacionario')
+    plt.plot(t[stationary_index:], va[stationary_index:], color='violet', linewidth=2, label='Estado estacionario')
 
     plt.xlabel("t")
     plt.ylabel(r"$v_a(t)$")
+    plt.ylim(0, 1.05)
     plt.grid(True)
     plt.legend()
         

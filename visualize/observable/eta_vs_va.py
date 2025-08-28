@@ -104,7 +104,7 @@ def plot_line_chart(csv_path, out_path=None, eta_filter=None, fixed_params=None)
 
     # Etiquetas encima de cada punto
     for x, y in zip(eta, va_mean):
-        plt.text(x, y + 0.02, f"{y:.3f}", ha="center", va="bottom", fontsize=9)
+        plt.text(x, y + 0.02, f"{y:.2f}", ha="center", va="bottom", fontsize=9)
 
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
